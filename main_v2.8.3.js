@@ -1,6 +1,5 @@
 // ----------------------------------------------------//
 // Se crean las instancias de las librerias a utilizar //
-//HOLA
 // ----------------------------------------------------//
 try{
 var modbus = require('jsmodbus');
@@ -37,6 +36,7 @@ var ctLabeller=0,actualLabeller=0,timeLabeller=0,stopCountLabeller=0,secLabeller
 var speedFlag=0, statePalletisation=0;
 var publishConfig;
 var secPubNub=0;
+var tempTimeLabeller = 0, tempTimeTapper = 0, tempTimeCheckweigher = 0, tempTimePrinter = 0, tempTimeEOL = 0, tempTimeFillerCapper = 0, tempTimeCounterCaps = 0,
 
 
 var files = fs.readdirSync("/home/pi/BYD_L6_LOGS/"); //Leer documentos
@@ -83,7 +83,6 @@ function DoRead(){
         if (secLabeller>=60){
             if(stopCountLabeller==0||flagStopLabeller==1){
                flagPrintLabeller=1;
-               ////console.log(stateLabeller);
                 secLabeller=0;
                 speedLabeller=ctLabeller-speedTempLabeller;
                 speedTempLabeller=ctLabeller;
@@ -93,20 +92,16 @@ function DoRead(){
             }
         }
         secLabeller++;
-        ////console.log(secLabeller);
         if(ctLabeller>actualLabeller){
             stateLabeller=1;//RUN
             if(stopCountLabeller>=timeStop){
                 speedLabeller=0;
                 flagPrintLabeller=1;
-                ////console.log(stateLabeller);
                 secLabeller=0;
             }
             timeLabeller=Date.now();
             stopCountLabeller=0;
             flagStopLabeller=0;
-
-
         }else if(ctLabeller==actualLabeller){
             if(stopCountLabeller==0){
                 timeLabeller=Date.now();
@@ -117,7 +112,6 @@ function DoRead(){
                 speedLabeller=0;
                 if(flagStopLabeller==0){
                     flagPrintLabeller=1;
-                    ////console.log(stateLabeller);
                     secLabeller=0;
                 }
                 flagStopLabeller=1;
@@ -140,14 +134,17 @@ function DoRead(){
         Labeller = {
             ST: stateLabeller,
             CPQO: joinWord(resp.register[35],resp.register[34]),
-			CPQR: joinWord(resp.register[37],resp.register[36]),
+			      CPQR: joinWord(resp.register[37],resp.register[36]),
             SP: speedLabeller
         };
         if(flagPrintLabeller==1){
+          if (timeLabeller == tempTimeLabeller)
+            timeLabeller = Date.now()
             for(var key in Labeller){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_Labeller_l6.log","tt="+timeLabeller+",var="+key+",val="+Labeller[key]+"\n");
             }
             flagPrintLabeller=0;
+            tempTimeLabeller = timeLabeller
         }
 //Labeller END -------------------------------------------------------------------------------------------------------------------
 
@@ -226,10 +223,13 @@ function DoRead(){
             SP: speedTapper
         };
         if(flagPrintTapper==1){
+          if(timeTapper == tempTimeTapper)
+            timeTapper = Date.now()
             for(var key in Tapper){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_Tapper_l6.log","tt="+timeTapper+",var="+key+",val="+Tapper[key]+"\n");
             }
             flagPrintTapper=0;
+            tempTimeTapper = timeTapper
         }
 //Tapper END -------------------------------------------------------------------------------------------------------------------
 
@@ -313,14 +313,17 @@ function DoRead(){
         checkWeigher = {
             ST: statecheckWeigher,
             CPQO: joinWord(resp.register[23],resp.register[22]),
-			CPQR: joinWord(resp.register[25],resp.register[24]),
+			      CPQR: joinWord(resp.register[25],resp.register[24]),
             SP: speedcheckWeigher
         };
         if(flagPrintcheckWeigher==1){
+          if(timecheckWeigher == tempTimeCheckweigher)
+            timecheckWeigher = Date.now()
             for(var key in checkWeigher){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_checkWeigher_l6.log","tt="+timecheckWeigher+",var="+key+",val="+checkWeigher[key]+"\n");
             }
             flagPrintcheckWeigher=0;
+            tempTimeCheckweigher = timecheckWeigher
         }
 //checkWeigher END -------------------------------------------------------------------------------------------------------------
 //Printer ----------------------------------------------------------------------------------------------------------------------
@@ -400,10 +403,13 @@ function DoRead(){
             SP: speedPrinter
         };
         if(flagPrintPrinter==1){
+          if(timePrinter == tempTimePrinter)
+           timePrinter = Date.now()
             for(var key in Printer){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_Printer_l6.log","tt="+timePrinter+",var="+key+",val="+Printer[key]+"\n");
             }
             flagPrintPrinter=0;
+            tempTimePrinter = timePrinter
         }
 //Printer END ------------------------------------------------------------------------------------------------------------
 //EOL  -------------------------------------------------------------------------------------------------------------------
@@ -472,10 +478,13 @@ function DoRead(){
             SP:     speedEOL
         };
             if(flagPrintEOL==1){
+              if (timeEOL == tempTimeEOL)
+                timeEOL = Date.now()
                 for(var key in EOL){
                     fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_EOL_l6.log","tt="+timeEOL+",var="+key+",val="+EOL[key]+"\n");
                 }
                 flagPrintEOL=0;
+                tempTimeEOL = timeEOL
             }
 //EOL  END-------------------------------------------------------------------------------------------------------------------
 //FillerCapper --------------------------------------------------------------------------------------------------------------
@@ -541,10 +550,13 @@ function DoRead(){
         };
 
         if(flagPrintFillerCapper==1){
+          if(timeFillerCapper == tempTimeFillerCapper)
+            timeFillerCapper = Date.now()
             for(var key in FillerCapper){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_FillerCapper_l6.log","tt="+timeFillerCapper+",var="+key+",val="+FillerCapper[key]+"\n");
             }
             flagPrintFillerCapper=0;
+            tempTimeFillerCapper = timeFillerCapper
         }
 //FILLER CAPPER END -------------------------------------------------------------------------------------------------------------------
 
@@ -617,10 +629,13 @@ function DoRead(){
             SP: speedCounterCaps
         };
         if(flagPrintCounterCaps==1){
+          if(timeCounterCaps == tempTimeCounterCaps)
+            timeCounterCaps = Date.now()
             for(var key in CounterCaps){
                 fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_CounterCaps_l6.log","tt="+timeCounterCaps+",var="+key+",val="+CounterCaps[key]+"\n");
             }
             flagPrintCounterCaps=0;
+            tempTimeCounterCaps = timeCounterCaps
         }
 //CounterCaps END -------------------------------------------------------------------------------------------------------------
 
@@ -634,271 +649,6 @@ function DoRead(){
     ST: statePalletisation
   };
 //Palletisacion END --------------------------------------------------------------------------------------------------------------------
-//Tapper ----------------------------------------------------------------------------------------------------------------------
-        ctTapper = joinWord(resp.register[27],resp.register[26]);
-        if(flagONS3==0){
-            speedTempTapper=ctTapper;
-            flagONS3=1;
-        }
-        if (secTapper>=80){
-            if(stopCountTapper==0||flagStopTapper==1){
-               flagPrintTapper=1;
-               ////console.log(stateTapper);
-                secTapper=0;
-                speedTapper=ctTapper-speedTempTapper;
-                speedTempTapper=ctTapper;
-            }
-            if(flagStopTapper==1){
-                timeTapper=Date.now();
-            }
-        }
-        secTapper++;
-        ////console.log(secTapper);
-        if(ctTapper>actualTapper){
-            stateTapper=1;//RUN
-            if(stopCountTapper>=60){
-                speedTapper=(ctTapper-speedTempTapper)*60;
-                flagPrintTapper=1;
-                ////console.log(stateTapper);
-                secTapper=0;
-            }
-            timeTapper=Date.now();
-            stopCountTapper=0;
-            flagStopTapper=0;
-
-
-        }else if(ctTapper==actualTapper){
-            if(stopCountTapper==0){
-                timeTapper=Date.now();
-            }
-            stopCountTapper++;
-            if(stopCountTapper>=60){
-                stateTapper=2;//STOP
-                speedTapper=0;
-                if(flagStopTapper==0){
-                    flagPrintTapper=1;
-                    ////console.log(stateTapper);
-                    secTapper=0;
-                }
-                flagStopTapper=1;
-            }
-        }
-        if(stateTapper==2){
-            speedTempTapper=ctTapper;
-        }
-
-        actualTapper=ctTapper;
-        //console.log("Front of Tapper: "+dataSensor[14]);
-        //console.log("Exit of Tapper: "+dataSensor[13]);
-        if(stateTapper==2){
-            if(dataSensor[14]==0 && dataSensor[11]==1){
-                stateTapper=3;//Wait
-            }else{
-                /*if(dataSensor[14]==1 && dataSensor[13]==1){
-                    stateTapper=4;//Block
-                }*/
-                if(dataSensor[11]==0){
-                    stateTapper=4;//Block
-                }
-            }
-         if(Palletisacion.ST==2&&(BottleSeparator.ST==2||Shrinkwrapper.ST==2)){
-          stateTapper=2;
-        }
-        }
-
-
-        Tapper = {
-            ST: stateTapper,
-            CPQO: joinWord(resp.register[27],resp.register[26]),
-            SP: speedTapper
-        };
-        if(flagPrintTapper==1){
-            for(var key in Tapper){
-                fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_Tapper_l6.log","tt="+timeTapper+",var="+key+",val="+Tapper[key]+"\n");
-            }
-            flagPrintTapper=0;
-        }
-//Tapper END -------------------------------------------------------------------------------------------------------------------
-
-//checkWeigher -----------------------------------------------------------------------------------------------------------------
-        ctcheckWeigher = joinWord(resp.register[23],resp.register[22]);
-        if(flagONS4==0){
-            speedTempcheckWeigher=ctcheckWeigher;
-            flagONS4=1;
-        }
-        if (seccheckWeigher>=80){
-            if(stopCountcheckWeigher==0||flagStopcheckWeigher==1){
-               flagPrintcheckWeigher=1;
-               ////console.log(statecheckWeigher);
-                seccheckWeigher=0;
-                speedcheckWeigher=ctcheckWeigher-speedTempcheckWeigher;
-                speedTempcheckWeigher=ctcheckWeigher;
-            }
-            if(flagStopcheckWeigher==1){
-                timecheckWeigher=Date.now();
-            }
-        }
-        seccheckWeigher++;
-        ////console.log(seccheckWeigher);
-        if(ctcheckWeigher>actualcheckWeigher){
-            statecheckWeigher=1;//RUN
-            if(stopCountcheckWeigher>=60){//timeStopbls
-              speedFlag=1;
-                //speedcheckWeigher=(ctcheckWeigher-speedTempcheckWeigher)*60;
-                //flagPrintcheckWeigher=1;
-                ////console.log(statecheckWeigher);
-                seccheckWeigher=0;
-            }
-            timecheckWeigher=Date.now();
-            stopCountcheckWeigher=0;
-            flagStopcheckWeigher=0;
-
-
-        }else if(ctcheckWeigher==actualcheckWeigher){
-            if(stopCountcheckWeigher==0){
-                timecheckWeigher=Date.now();
-            }
-            stopCountcheckWeigher++;
-            if(stopCountcheckWeigher>=60){//timeStop
-                statecheckWeigher=2;//STOP
-                speedcheckWeigher=0;
-                if(flagStopcheckWeigher==0){
-                    flagPrintcheckWeigher=1;
-                    ////console.log(statecheckWeigher);
-                    seccheckWeigher=0;
-                }
-                flagStopcheckWeigher=1;
-            }
-        }
-        if(speedFlag==1){
-          if(seccheckWeigher>=3){
-            speedcheckWeigher=((ctcheckWeigher-speedTempcheckWeigher)*60)/3;
-            flagPrintcheckWeigher=1;
-            speedFlag=0;
-          }
-        }
-
-        if(statecheckWeigher==2){
-            speedTempcheckWeigher=ctcheckWeigher;
-        }
-
-        actualcheckWeigher=ctcheckWeigher;
-            //console.log("Front of CheckWeigher: "+dataSensor[1]);
-            //console.log("Exit of CheckWeigher: "+dataSensor[0]);
-        if(statecheckWeigher==2){
-            if(dataSensor[1]==0 && dataSensor[11]==1){
-                statecheckWeigher=3;
-            }else{
-                /*if(dataSensor[1]==1 && dataSensor[0]==1){
-                    statecheckWeigher=4;
-                }*/
-                if(dataSensor[11]==0){
-                    statecheckWeigher=4;
-                }
-            }
-        if(Palletisacion.ST==2&&(BottleSeparator.ST==2||Shrinkwrapper.ST==2)){
-          statecheckWeigher=2;
-        }
-        }
-        checkWeigher = {
-            ST: statecheckWeigher,
-            CPQO: joinWord(resp.register[23],resp.register[22]),
-            CPQR: joinWord(resp.register[25],resp.register[24]),
-            SP: speedcheckWeigher
-        };
-        if(flagPrintcheckWeigher==1){
-            for(var key in checkWeigher){
-                fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_checkWeigher_l6.log","tt="+timecheckWeigher+",var="+key+",val="+checkWeigher[key]+"\n");
-            }
-            flagPrintcheckWeigher=0;
-        }
-//checkWeigher END -------------------------------------------------------------------------------------------------------------
-//Printer ----------------------------------------------------------------------------------------------------------------------
-        ctPrinter = joinWord(resp.register[19],resp.register[18]);
-        if(flagONS5==0){
-            speedTempPrinter=ctPrinter;
-            flagONS5=1;
-        }
-        if (secPrinter>=60){
-            if(stopCountPrinter==0||flagStopPrinter==1){
-               flagPrintPrinter=1;
-               ////console.log(statePrinter);
-                secPrinter=0;
-                speedPrinter=ctPrinter-speedTempPrinter;
-                speedTempPrinter=ctPrinter;
-            }
-            if(flagStopPrinter==1){
-                timePrinter=Date.now();
-            }
-        }
-        secPrinter++;
-        ////console.log(secPrinter);
-        if(ctPrinter>actualPrinter){
-            statePrinter=1;//RUN
-            if(stopCountPrinter>=30){//timeStop
-                speedPrinter=(ctPrinter-speedTempPrinter)*60;
-                flagPrintPrinter=1;
-                ////console.log(statePrinter);
-                secPrinter=0;
-            }
-            timePrinter=Date.now();
-            stopCountPrinter=0;
-            flagStopPrinter=0;
-
-
-        }else if(ctPrinter==actualPrinter){
-            if(stopCountPrinter==0){
-                timePrinter=Date.now();
-            }
-            stopCountPrinter++;
-            if(stopCountPrinter>=30){//timeStop
-                statePrinter=2;//STOP
-                speedPrinter=0;
-                if(flagStopPrinter==0){
-                    flagPrintPrinter=1;
-                    ////console.log(statePrinter);
-                    secPrinter=0;
-                }
-                flagStopPrinter=1;
-            }
-        }
-        if(statePrinter==2){
-            speedTempPrinter=ctPrinter;
-        }
-
-        actualPrinter=ctPrinter;
-        /*console.log("Front of Printer: "+dataSensor[4]);
-           console.log("Exit of Printer: "+dataSensor[3]);*/
-        if(statePrinter==2){
-            if(dataSensor[4]==0 && dataSensor[11]==1){
-              //Entrada 4
-              //Salida 3
-                statePrinter=3;//WAIT
-            }else{
-                /*if(dataSensor[3]==1 && dataSensor[4]==1){
-                    statePrinter=4;//BLOCK
-                }*/
-                if(dataSensor[11]==0){
-                    statePrinter=4;//BLOCK
-                }
-            }
-        if(Palletisacion.ST==2&&(BottleSeparator.ST==2||Shrinkwrapper.ST==2)){
-          statePrinter=2;
-        }
-        }
-        Printer = {
-            ST: statePrinter,
-            CPQO: joinWord(resp.register[19],resp.register[18]),
-                  CPQR: joinWord(resp.register[21],resp.register[20]),
-            SP: speedPrinter
-        };
-        if(flagPrintPrinter==1){
-            for(var key in Printer){
-                fs.appendFileSync("/home/pi/BYD_L6_LOGS/pol_byd_Printer_l6.log","tt="+timePrinter+",var="+key+",val="+Printer[key]+"\n");
-            }
-            flagPrintPrinter=0;
-        }
-//Printer END ------------------------------------------------------------------------------------------------------------
 //Barcode -------------------------------------------------------------------------------------------------------------
 if(resp.register[40]==0&&resp.register[41]==0&&resp.register[42]==0&&resp.register[43]==0&&resp.register[44]==0&&resp.register[45]==0&&resp.register[46]==0&&resp.register[47]==0){
   Barcode='0';
@@ -913,8 +663,6 @@ if(resp.register[40]==0&&resp.register[41]==0&&resp.register[42]==0&&resp.regist
   var dig8=hex2a(assignment(resp.register[47]).toString(16));
   Barcode=dig1+dig2+dig3+dig4+dig5+dig6+dig7+dig8;
 }
-console.log(resp.register)
-console.log(Barcode);
 if(isNaN(Barcode)){
   Barcode = '0';
 }
