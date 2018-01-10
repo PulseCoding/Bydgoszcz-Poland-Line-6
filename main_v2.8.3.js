@@ -36,7 +36,7 @@ var ctLabeller=0,actualLabeller=0,timeLabeller=0,stopCountLabeller=0,secLabeller
 var speedFlag=0, statePalletisation=0;
 var publishConfig;
 var secPubNub=0;
-var tempTimeLabeller = 0, tempTimeTapper = 0, tempTimeCheckweigher = 0, tempTimePrinter = 0, tempTimeEOL = 0, tempTimeFillerCapper = 0, tempTimeCounterCaps = 0,
+var tempTimeLabeller = 0, tempTimeTapper = 0, tempTimeCheckweigher = 0, tempTimePrinter = 0, tempTimeEOL = 0, tempTimeFillerCapper = 0, tempTimeCounterCaps = 0
 
 
 var files = fs.readdirSync("/home/pi/BYD_L6_LOGS/"); //Leer documentos
