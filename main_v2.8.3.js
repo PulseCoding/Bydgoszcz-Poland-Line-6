@@ -43,11 +43,10 @@ var files = fs.readdirSync("/home/pi/BYD_L6_LOGS/"); //Leer documentos
 var text2send=[];//Vector a enviar
 var i=0;
 
-
 pubnub = new PubNub({
-  publishKey : "pub-c-ac9f95b7-c3eb-4914-9222-16fbcaad4c59",
-  subscribeKey : "sub-c-206bed96-8c16-11e7-9760-3a607be72b06",
-  uuid: "L6"
+  publishKey : "pub-c-82cf38a9-061a-43e2-8a0f-21a6770ab473",
+  subscribeKey : "sub-c-e14aa146-bab0-11e8-b6ef-c2e67adadb66",
+  uuid : "bydgoszcz-L6-monitoring"
 });
 // --------------------------------------------------------- //
 //Función que realiza las instrucciones de lectura de datos  //
