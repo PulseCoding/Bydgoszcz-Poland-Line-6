@@ -1,7 +1,7 @@
 // ----------------------------------------------------//
 // Se crean las instancias de las librerias a utilizar //
 // ----------------------------------------------------//
-try {
+
   var modbus = require('jsmodbus');
   var fs = require('fs');
   var httpClient = require('node-rest-client').Client;
